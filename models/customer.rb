@@ -14,14 +14,53 @@ class Customer
 
   # CRUD
 
-def save()
-  sql = "INSERT INTO customers (name, funds)
-          VALUES ($1,$2,$3)
-          RETURNING id"
-  values = [@name, @funds]
-  customer = SqlRunner.new(sql, values).first
-  @id = customer['id'].to_i
+  #  create
+
+  def save()
+    sql = "INSERT INTO customers (name, funds)
+    VALUES ($1,$2)
+    RETURNING id"
+    values = [@name, @funds]
+    customer = SqlRunner.new(sql, values).first
+    @id = customer['id'].to_i
+  end
+
+
+  # read
+
+  def self.all()
+    sql = "RETURN customers.* FROM customers"
+    customers = SqlRunner.new(sql)
+    results = customers.map{|customer| Customer.new(customer)}
+    return results
+  end
+
+# update
+
+def update()
+  sql = "UPDATE customers SET(name, funds)VALUES ($1,$2) WHERE id = $3"
+  values = [@name, @funds, @id]
+  SqlRunner.new(sql, values)
 end
+
+ # delete
+
+ def self.delete_all()
+   sql = "DELETE FROM customers"
+   SqlRunner.new(sql)
+ end
+
+ def delete()
+   sql = "DELETE FROM customers WHERE id = $1"
+   values = (@id)
+   SqlRunner.new(sql, values)
+ end
+
+############################################################################
+
+
+
+
 
 
 
