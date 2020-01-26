@@ -11,7 +11,7 @@ class Film
     @price = options['price']
   end
 
-############################################################################
+  ############################################################################
   # CRUD
 
   # create
@@ -20,7 +20,7 @@ class Film
     VALUES ($1,$2)
     RETURNING id"
     values = [@title, @price]
-    film = SqlRunner.new(sql, values).first
+    film = SqlRunner.run(sql, values).first
     @id = film['id'].to_i
   end
 
@@ -28,7 +28,7 @@ class Film
 
   def self.all()
     sql = "RETURN films.* FROM films"
-    films = SqlRunner.new(sql)
+    films = SqlRunner.run(sql)
     results = films.map{|film| Film.new(film)}
     return results
   end
@@ -39,23 +39,32 @@ class Film
   def update()
     sql = "UPDATE films SET(title, price)VALUES ($1,$2) WHERE id = $3"
     values = [@title, @price, @id]
-    SqlRunner.new(sql, values)
+    SqlRunner.run(sql, values)
   end
 
   # delete
 
   def self.delete_all()
     sql = "DELETE FROM films"
-    SqlRunner.new(sql)
+    SqlRunner.run(sql)
   end
 
   def delete()
     sql = "DELETE FROM films WHERE id = $1"
-    values = (@id)
-    SqlRunner.new(sql, values)
+    values = [@id]
+    SqlRunner.run(sql, values)
   end
 
-############################################################################
+  ############################################################################
+
+  def customers
+    sql = "SELECT customers.* FROM customers INNER JOIN tickets ON tickets.customer_id = customers.id WHERE tickets.film_id = $1"
+    values = [@id]
+    customers_data = SqlRunner.run(sql, values)
+    results = customers_data.map{|customer| Customer.new(customer)}
+    return results
+  end
+
 
 
 
